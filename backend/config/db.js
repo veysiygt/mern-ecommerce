@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const db = () => {
   mongoose
-    .connect("mongodb://mongodb:27017/ecommerce", {})
+    .connect("mongodb://localhost:27017/ecommerce", {})
     .then(() => {
       console.log("Mongodb connected successfully");
     })
