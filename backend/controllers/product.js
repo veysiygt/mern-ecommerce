@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const ProductFilter = require("../utils/productFilter");
+const cloudinary = require("cloudinary").v2;
 
 const allProducts = async (req, res) => {
   try {
@@ -23,6 +24,14 @@ const allProducts = async (req, res) => {
   }
 };
 
+const adminProducts = async (req, res, next) => {
+  const products = await Product.find();
+
+  res.status(200).json({
+    products,
+  });
+};
+
 const detailProducts = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -39,8 +48,29 @@ const detailProducts = async (req, res) => {
   }
 };
 
-const createProducts = async (req, res) => {
+const createProducts = async (req, res, next) => {
   try {
+    let images = [];
+    if (typeof req.body.images === "string") {
+      images.push(req.body.images);
+    } else {
+      images = req.body.images;
+    }
+
+    let allImage = [];
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.uploader.upload(images[i], {
+        folder: "products",
+        overwrite: true,
+      });
+      allImage.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+
+    req.body.images = allImage;
+
     const product = await Product.create(req.body);
     res.status(201).json({ product });
   } catch (error) {
@@ -51,9 +81,16 @@ const createProducts = async (req, res) => {
   }
 };
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
+
+    for (let i = 0; i < product.images.length; i++) {
+      await cloudinary.uploader.destroy(product.images[i].public_id, {
+        folder: "products",
+      });
+    }
+
     if (product) {
       await product.remove();
       res.status(200).json({ message: "Product deleted successfully." });
@@ -68,10 +105,42 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-const updateProduct = async (req, res) => {
+const updateProduct = async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    const product = await Product.findById(req.params.id);
+
+    let images = [];
+    if (typeof req.body.images === "string") {
+      images.push(req.body.images);
+    } else {
+      images = req.body.images;
+    }
+
+    if (images !== undefined) {
+      for (let i = 0; i < product.images.length; i++) {
+        await cloudinary.uploader.destroy(product.images[i].public_id, {
+          folder: "products",
+        });
+      }
+    }
+
+    let allImage = [];
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.uploader.upload(images[i], {
+        folder: "products",
+        overwrite: true,
+      });
+      allImage.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+
+    req.body.images = allImage;
+
+    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
+      runValidators: true,
     });
     if (product) {
       res.status(200).json({ product });
@@ -86,10 +155,41 @@ const updateProduct = async (req, res) => {
   }
 };
 
+const createReview = async (req, res, next) => {
+  const { productId, comment, rating } = req.body;
+
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    comment,
+    rating: Number(rating),
+  };
+  const product = await Product.findById(productId);
+
+  product.reviews.push(review);
+
+  let avg = 0;
+  product.reviews.forEach((rev) => {
+    avg += rev.rating;
+  });
+
+  product.rating = avg / product.reviews.length;
+
+  await product.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    message: "Review created successfully.",
+    review,
+    product,
+  });
+};
+
 module.exports = {
   allProducts,
   detailProducts,
   createProducts,
   deleteProduct,
   updateProduct,
+  createReview,
+  adminProducts,
 };
