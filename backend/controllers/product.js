@@ -5,12 +5,15 @@ const cloudinary = require("cloudinary").v2;
 const allProducts = async (req, res) => {
   try {
     const resultPerPage = 10;
+    const productQuery = Product.find();
+    const productFilter = new ProductFilter(productQuery, req.query);
 
-    const productFilter = new ProductFilter(Product.find(), req.query)
+    const filteredProductsQuery = await productFilter
       .search()
       .filters()
-      .pagination(resultPerPage);
-    const products = await productFilter.query;
+      .pagination(resultPerPage).query;
+    const products = await filteredProductsQuery;
+
     if (products.length > 0) {
       res.status(200).json({ products });
     } else {
@@ -70,6 +73,7 @@ const createProducts = async (req, res, next) => {
     }
 
     req.body.images = allImage;
+    req.body.user = req.user._id;
 
     const product = await Product.create(req.body);
     res.status(201).json({ product });
