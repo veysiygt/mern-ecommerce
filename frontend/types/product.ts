@@ -7,7 +7,7 @@ export interface Product {
     images: {
       public_id: string;
       url: string;
-    };
+    }[];
     reviews: Review[];
   }
   
