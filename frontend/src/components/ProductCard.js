@@ -1,16 +1,14 @@
-import { Product } from "@/types/product";
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
-interface ProductItemProps {
-  product: Product;
-}
+const ProductCard = ({ product }) => {
+  const navigation = useNavigation();
 
-const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => navigation.navigate('ProductDetail', { productId: product._id })}>
       <View style={styles.itemContainer}>
-      <Image source={{ uri: product.images[0]?.url }} style={styles.image} />
+        <Image source={{ uri: product.images[0]?.url }} style={styles.image} />
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{product.name}</Text>
           <Text style={styles.price}>${product.price?.toFixed(2)}</Text>
@@ -49,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductItem;
+export default ProductCard;
