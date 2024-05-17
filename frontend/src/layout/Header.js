@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { KeyboardAvoidingView, StyleSheet } from "react-native";
 import { Appbar, Searchbar } from "react-native-paper";
 import CartIcon from "../components/CartIcon";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartItemCount, setCartItemCount] = useState(1);
-
+  const { itemCount } = useSelector((state) => state.carts);
   const onChangeSearch = (query) => setSearchQuery(query);
 
   return (
@@ -20,7 +20,7 @@ const Header = () => {
         />
         <Appbar.Content />
         <CartIcon
-          cartItemCount={cartItemCount} 
+          cartItemCount={itemCount} 
           onPress={() => console.log("Cart opened")} 
           style={styles.cartIcon}
         />

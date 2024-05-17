@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { Appbar, Badge } from "react-native-paper";
 
 const CartIcon = ({ cartItemCount, onPress, style }) => {
+
   return (
     <View style={[styles.iconContainer, style]}>
       <Appbar.Action icon="cart" onPress={onPress} />
