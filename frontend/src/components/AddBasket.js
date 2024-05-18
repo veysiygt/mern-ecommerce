@@ -1,20 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { addToCart } from "../redux/cartSlice";
 
 const AddBasket = ({ product }) => {
   const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.carts.items);
+  const [error, setError] = useState('');
 
   const handleAddToCart = () => {
-    dispatch(addToCart({ ...product, quantity: 1 }));
-    Toast.show({
-      type: "success",
-      text1: "Product added to cart!",
-      position: "bottom",
-      visibilityTime: 2000,
-    });
+    const existingCartItem = cartItems.find(item => item._id === product._id);
+    const quantityInCart = existingCartItem ? existingCartItem.quantity : 0;
+
+    if (quantityInCart + 1 > product.stock) {
+      setError('Stok sayısını geçtiniz');
+      Toast.show({
+        type: "error",
+        text1: "Stok sayısını geçtiniz!",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    } else {
+      setError('');
+      dispatch(addToCart({ ...product, quantity: 1 }));
+      Toast.show({
+        type: "success",
+        text1: "Product added to cart!",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+    }
   };
 
   return (
@@ -41,6 +57,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginTop: 5,
   },
 });
 

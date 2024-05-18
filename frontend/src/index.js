@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from "react-native-vector-icons/Ionicons";
 import HomeScreen from "./screens/HomeScreen";
+import BasketScreen from "./screens/BasketScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ProductDetailScreen from "./screens/ProductDetailScreen";
 
@@ -21,6 +22,11 @@ function HomeStack() {
       <Stack.Screen 
         name="ProductDetail" 
         component={ProductDetailScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Cart" 
+        component={BasketScreen} 
         options={{ headerShown: false }} 
       />
     </Stack.Navigator>
