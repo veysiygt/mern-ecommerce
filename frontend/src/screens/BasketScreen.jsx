@@ -12,8 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { increaseQuantity, decreaseQuantity } from "../redux/cartSlice";
-import TotalPrice from "../components/TotalPrice"; // TotalPrice bileşenini import ediyoruz
-import Purchase from "../components/Purchase"; // Purchase bileşenini import ediyoruz
+import TotalPrice from "../components/TotalPrice";
+import Purchase from "../components/Purchase";
 
 const BasketScreen = () => {
   const cartItems = useSelector((state) => state.carts.items);
@@ -36,7 +36,6 @@ const BasketScreen = () => {
 
   const handlePurchase = () => {
     console.log("Purchase pressed");
-    // Satın alma işlemi burada gerçekleştirilebilir
   };
 
   const renderItem = ({ item }) => (
