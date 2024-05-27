@@ -1,19 +1,12 @@
-import React from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-import { Appbar } from "react-native-paper";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/Ionicons";
-import { increaseQuantity, decreaseQuantity } from "../redux/cartSlice";
-import TotalPrice from "../components/TotalPrice";
-import Purchase from "../components/Purchase";
+import React from 'react';
+import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { Appbar } from 'react-native-paper';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { increaseQuantity, decreaseQuantity } from '../redux/cartSlice';
+import TotalPrice from '../components/TotalPrice'; // TotalPrice bileşenini import ediyoruz
+import Purchase from '../components/Purchase'; // Purchase bileşenini import ediyoruz
 
 const BasketScreen = () => {
   const cartItems = useSelector((state) => state.carts.items);
@@ -29,13 +22,11 @@ const BasketScreen = () => {
   };
 
   const calculateTotalPrice = () => {
-    return cartItems
-      .reduce((total, item) => total + item.price * item.quantity, 0)
-      .toFixed(2);
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   };
 
   const handlePurchase = () => {
-    console.log("Purchase pressed");
+    console.log('Purchase pressed');
   };
 
   const renderItem = ({ item }) => (
@@ -89,10 +80,10 @@ const styles = StyleSheet.create({
     backgroundColor: "151718",
   },
   itemContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: '#ccc',
     backgroundColor: "#f9f9f9",
     marginVertical: 5,
   },
@@ -103,26 +94,26 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   name: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   price: {
-    color: "green",
+    color: 'green',
   },
   quantity: {
-    color: "gray",
+    color: 'gray',
   },
   actionsContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   emptyText: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 18,
-    color: "gray",
+    color: 'gray',
     marginTop: 20,
   },
 });
