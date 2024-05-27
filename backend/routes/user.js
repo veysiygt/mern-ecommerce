@@ -8,10 +8,11 @@ const {
   userDetail,
 } = require("../controllers/user");
 const { authenticationMid } = require("../middleware/auth");
+const upload = require("../middleware/multer");
 
 const router = express.Router();
 
-router.post("/register", register);
+router.post("/register", upload.single('avatar'), register);
 router.post("/login", login);
 router.get("/logout", logout);
 router.post("/forgotPassword", forgotPassword);

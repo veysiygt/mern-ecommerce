@@ -8,15 +8,20 @@ const nodemailer = require("nodemailer");
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const register = async (req, res) => {
-  const avatar = await cloudinary.uploader.upload(req.body.avatar, {
-    folder: "avatars",
-    width: 130,
-    crop: "scale",
-  });
-
-  const { name, email, password } = req.body;
-
   try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password || !req.file) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const avatarBuffer = req.file.buffer.toString('base64');
+    const uploadedAvatar = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${avatarBuffer}`, {
+      folder: "avatars",
+      width: 130,
+      crop: "scale",
+    });
+
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
@@ -27,9 +32,7 @@ const register = async (req, res) => {
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters long" });
+      return res.status(400).json({ message: "Password must be at least 6 characters long" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -39,8 +42,8 @@ const register = async (req, res) => {
       email,
       password: passwordHash,
       avatar: {
-        public_id: avatar.public_id,
-        url: avatar.secure_url,
+        public_id: uploadedAvatar.public_id,
+        url: uploadedAvatar.secure_url,
       },
     });
 
@@ -59,12 +62,14 @@ const register = async (req, res) => {
       token,
     });
   } catch (error) {
+    console.error("Error during registration:", error);
     return res.status(500).json({
       message: "Server error during registration",
       error: error.message,
     });
   }
 };
+
 
 const login = async (req, res) => {
   try {
