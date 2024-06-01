@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -8,18 +8,36 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { Title } from "react-native-paper";
+import { Title, HelperText } from "react-native-paper";
+import { Formik } from "formik";
 import EmailInput from "../components/EmailInput";
 import PasswordInput from "../components/PasswordInput";
 import CustomButton from "../components/CustomButton";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, reset } from "../redux/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoginSchema } from "../validations/loginValidation";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const { isLoading, isError, errorMessage, isSuccess, userToken } =
+    useSelector((state) => state.auth);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  const handleLogin = () => {
-    console.log("Email:", email, "Password:", password);
+  useEffect(() => {
+    if (isSuccess && userToken) {
+      console.log("Login successful, navigating to Home tab");
+      AsyncStorage.setItem("userToken", userToken).then(() => {
+        navigation.navigate("Home");
+        dispatch(reset());
+      });
+    }
+  }, [isSuccess, userToken, dispatch, navigation]);
+
+  const handleLogin = async (values) => {
+    await dispatch(
+      loginUser({ email: values.email, password: values.password })
+    );
   };
 
   const toggleSecureEntry = () => {
@@ -35,28 +53,58 @@ const LoginScreen = ({ navigation }) => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Title style={styles.title}>Login</Title>
-          <EmailInput email={email} setEmail={setEmail} />
-          <PasswordInput
-            password={password}
-            setPassword={setPassword}
-            secureTextEntry={secureTextEntry}
-            toggleSecureEntry={toggleSecureEntry}
-          />
-          <View style={styles.customButton}>
-            <CustomButton
-              onPress={handleLogin}
-              title="Login"
-              width={150}
-              height={50}
-            />
-            <Text style={styles.orText}>or</Text>
-            <CustomButton
-              onPress={() => navigation.navigate("Register")}
-              title="Register"
-              width={150}
-              height={50}
-            />
-          </View>
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            validationSchema={LoginSchema}
+            onSubmit={handleLogin}
+          >
+            {({ handleChange, handleSubmit, values, errors, touched }) => (
+              <View>
+                {isError && (
+                  <HelperText
+                    type="error"
+                    visible={true}
+                    style={styles.helperText}
+                  >
+                    {errorMessage}
+                  </HelperText>
+                )}
+                <EmailInput
+                  email={values.email}
+                  setEmail={handleChange("email")}
+                  error={touched.email && errors.email ? errors.email : ""}
+                  isValid={touched.email && !errors.email}
+                />
+                <PasswordInput
+                  label="Password"
+                  password={values.password}
+                  setPassword={handleChange("password")}
+                  secureTextEntry={secureTextEntry}
+                  toggleSecureEntry={toggleSecureEntry}
+                  error={
+                    touched.password && errors.password ? errors.password : ""
+                  }
+                  isValid={touched.password && !errors.password}
+                />
+                <View style={styles.customButton}>
+                  <CustomButton
+                    onPress={handleSubmit}
+                    title="Login"
+                    width={150}
+                    height={50}
+                    isLoading={isLoading}
+                  />
+                  <Text style={styles.orText}>or</Text>
+                  <CustomButton
+                    onPress={() => navigation.navigate("AvatarUpload")}
+                    title="Register"
+                    width={150}
+                    height={50}
+                  />
+                </View>
+              </View>
+            )}
+          </Formik>
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -65,7 +113,7 @@ const LoginScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    marginTop: 120,
     justifyContent: "center",
     paddingHorizontal: 16,
   },
@@ -83,6 +131,9 @@ const styles = StyleSheet.create({
     marginVertical: 12,
     fontSize: 16,
     color: "gray",
+  },
+  helperText: {
+    textAlign: "center",
   },
 });
 

@@ -1,22 +1,37 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { TextInput } from "react-native-paper";
+import { TextInput, HelperText } from "react-native-paper";
 import Icon from "react-native-vector-icons/Ionicons";
 
-const PasswordInput = ({ password, setPassword, secureTextEntry, toggleSecureEntry }) => {
+const PasswordInput = ({
+  password,
+  setPassword,
+  secureTextEntry,
+  toggleSecureEntry,
+  label,
+  error,
+  isValid,
+}) => {
   return (
     <View style={styles.passwordContainer}>
       <TextInput
-        label="Password"
+        label={label}
         value={password}
         style={styles.input}
         onChangeText={setPassword}
         secureTextEntry={secureTextEntry}
         autoCapitalize="none"
+        error={!!error}
       />
-      <TouchableOpacity onPress={toggleSecureEntry} style={styles.icon}>
-        <Icon name={secureTextEntry ? "eye-off" : "eye"} size={20} />
-      </TouchableOpacity>
+      <HelperText type="error" visible={!!error}>
+        {error}
+      </HelperText>
+      <View style={styles.iconContainer}>
+        {isValid && <Icon name="checkmark-circle" size={20} color="green" />}
+        <TouchableOpacity onPress={toggleSecureEntry} style={styles.icon}>
+          <Icon name={secureTextEntry ? "eye-off" : "eye"} size={20} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -27,13 +42,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
-    marginBottom: 12,
     backgroundColor: "white",
   },
-  icon: {
+  iconContainer: {
     position: "absolute",
     right: 15,
     top: 15,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    marginLeft: 5,
   },
 });
 

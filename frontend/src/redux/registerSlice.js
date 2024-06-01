@@ -5,23 +5,27 @@ const initialState = {
   isSuccess: false,
   isError: false,
   errorMessage: "",
+  userToken: null,
 };
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async (userData, thunkAPI) => {
+  async (formData, thunkAPI) => {
     try {
-      const response = await fetch("http://localhost:4000/api/register", );
+      const response = await fetch("http://localhost:4000/register", {
+        method: "POST",
+        body: formData,
+      });
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
+        const errorMessages =
+          data.message || "An error occurred during registration.";
+        return thunkAPI.rejectWithValue(errorMessages);
       }
-
-      return data;
+      return data.token;
     } catch (error) {
-      const message = error.message || "Something went wrong";
-      return thunkAPI.rejectWithValue(message);
+      return thunkAPI.rejectWithValue("Network error or other error.");
     }
   }
 );
@@ -35,6 +39,7 @@ const registerSlice = createSlice({
       state.isSuccess = false;
       state.isError = false;
       state.errorMessage = "";
+      state.userToken = null;
     },
   },
   extraReducers: (builder) => {
@@ -42,14 +47,18 @@ const registerSlice = createSlice({
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(registerUser.fulfilled, (state) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.isError = false;
+        state.errorMessage = "";
+        state.userToken = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.errorMessage = action.payload;
+        state.errorMessage =
+          action.payload || "An unexpected error occurred during registration.";
       });
   },
 });

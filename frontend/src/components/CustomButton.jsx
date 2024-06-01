@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "react-native-paper";
+import { Button, ActivityIndicator } from "react-native-paper";
 import { StyleSheet } from "react-native";
 
 const CustomButton = ({
@@ -9,25 +9,26 @@ const CustomButton = ({
   style,
   width,
   height,
+  isLoading,
   ...props
 }) => {
+  const buttonColor = isLoading ? "#6A56A6" : "#6A56A6";
+
   return (
     <Button
       mode={mode}
       onPress={onPress}
-      style={[styles.button, { width, height }, style]}
+      style={[styles.button, { width, height, backgroundColor: buttonColor }, style]}
       contentStyle={styles.content}
+      disabled={isLoading}
       {...props}
     >
-      {title}
+      {isLoading ? <ActivityIndicator color="#fff" /> : title}
     </Button>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    marginTop: 12,
-  },
   content: {
     justifyContent: "center",
     alignItems: "center",
