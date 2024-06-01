@@ -4,23 +4,34 @@ const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const registerValidation = require("../validations/RegisterValidation");
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const register = async (req, res) => {
+  const validationData = {
+    ...req.body,
+    avatar: req.file,
+  };
+
+  const { error } = registerValidation(validationData);
+  if (error) {
+    console.log(error);
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password || !req.file) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const avatarBuffer = req.file.buffer.toString('base64');
-    const uploadedAvatar = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${avatarBuffer}`, {
-      folder: "avatars",
-      width: 130,
-      crop: "scale",
-    });
+    const avatarBuffer = req.file.buffer.toString("base64");
+    const uploadedAvatar = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${avatarBuffer}`,
+      {
+        folder: "avatars",
+        width: 130,
+        crop: "scale",
+      }
+    );
 
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: "Invalid email format" });
@@ -32,7 +43,9 @@ const register = async (req, res) => {
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -70,10 +83,11 @@ const register = async (req, res) => {
   }
 };
 
-
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    console.log("Email:", email, "Password:", password);
 
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: "Invalid email format" });
@@ -81,12 +95,14 @@ const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ message: "User not found or incorrect login" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).json({ message: "User not found or incorrect login" });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.SECRET_TOKEN, {
