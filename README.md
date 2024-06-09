@@ -15,7 +15,9 @@ Clone the repository:
 
 ```sh
 git clone https://github.com/veysiygt/react-native-ecommerce
+
 cd frontend
+
 yarn install
 # or
 npm install
