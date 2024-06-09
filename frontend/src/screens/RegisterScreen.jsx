@@ -30,7 +30,7 @@ const RegisterScreen = ({ navigation, route }) => {
     if (isSuccess && userToken) {
       console.log("Registration successful, navigating to HomeScreen");
       AsyncStorage.setItem("userToken", userToken).then(() => {
-        navigation.navigate("HomeScreen");
+        //navigation.navigate("HomeScreen");
         dispatch(reset());
       });
     }

@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
           <Text style={styles.name}>{product.name}</Text>
           <Text style={styles.price}>${product.price?.toFixed(2)}</Text>
           <Text style={styles.description}>{product.description}</Text>
-          {product.stock === 0 && <Text style={styles.outOfStockText}>Ürün tükendi</Text>}
+          {product.stock === 0 && <Text style={styles.outOfStockText}>Product Finished</Text>}
         </View>
       </View>
     </TouchableOpacity>
