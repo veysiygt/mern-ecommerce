@@ -1,6 +1,6 @@
-# Frontend
+# E-Commerce
 
-Frontend is a mobile application developed using Expo and React Native. This guide explains how to set up the project and run it on a mobile device.
+E-Commerce is a mobile application developed using Expo and React Native. This guide explains how to set up the project and run it on a mobile device.
 
 ## Planned Features
 - Payment Integration: Implement payment gateways to handle transactions securely.
