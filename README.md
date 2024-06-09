@@ -33,6 +33,7 @@ docker compose up -d
 npm run start
 
 Login
-<img src="assets/screenshots/login.png" alt="Home Screen" width="300"/>
+<img src="frontend/assets/screenshots/login.png" alt="Home Screen" width="300"/>
+
 
 
