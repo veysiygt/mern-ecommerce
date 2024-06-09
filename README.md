@@ -16,6 +16,7 @@ Clone the repository:
 ```sh
 git clone https://github.com/veysiygt/react-native-ecommerce
 
+```sh
 cd frontend
 
 yarn install
@@ -33,9 +34,3 @@ npm install
 docker compose up -d
 
 npm run start
-
-Login
-<img src="frontend/assets/screenshots/login.png" alt="Home Screen" width="300"/>
-
-
-
