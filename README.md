@@ -16,7 +16,6 @@ Clone the repository:
 ```sh
 git clone https://github.com/veysiygt/react-native-ecommerce
 
-```sh
 cd frontend
 
 yarn install
@@ -26,6 +25,7 @@ npm install
 npx expo start
 
 Setting Up the Backend
+
 cd backend
 yarn install
 # or
