@@ -34,6 +34,7 @@ npm install
 docker compose up -d
 
 npm run start
+```
 
 ## Features
 	•Payment Integration: Implement payment gateways to handle transactions securely.
